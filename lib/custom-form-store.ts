@@ -1,55 +1,57 @@
-import { create } from "zustand"
+import { create } from "zustand";
 
 interface TeamRequirements {
-  teamSize: string
-  currentSolution: string
-  painPoints: string[]
+  memberSize: string;
+  currentSolution: string;
+  painPoints: string[];
+  communityOnboarding: string;
 }
 
 interface Features {
-  features: string[]
+  features: string[];
 }
 
 interface TimeLine {
-  budget: string
-  timeline: string
-  decisionMakers: string
+  budget: string;
+  timeline: string;
+  decisionMakers: string;
 }
 
 interface Contact {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  jobTitle: string
-  contactMethod: string
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  jobTitle: string;
+  contactMethod: string;
 }
 
 interface Security {
-  technicalRequirements: string
-  additionalInfo: string
-  referral: string
+  technicalRequirements: string;
+  additionalInfo: string;
+  referral: string;
 }
 
 interface CustomFormState {
-  teamRequirements: TeamRequirements
-  features: Features
-  timeLine: TimeLine
-  contact: Contact
-  security: Security
+  teamRequirements: TeamRequirements;
+  features: Features;
+  timeLine: TimeLine;
+  contact: Contact;
+  security: Security;
 
-  setTeamRequirements: (data: TeamRequirements) => void
-  setFeatures: (data: Features) => void
-  setTimeLine: (data: TimeLine) => void
-  setContact: (data: Contact) => void
-  setSecurity: (data: Security) => void
+  setTeamRequirements: (data: TeamRequirements) => void;
+  setFeatures: (data: Features) => void;
+  setTimeLine: (data: TimeLine) => void;
+  setContact: (data: Contact) => void;
+  setSecurity: (data: Security) => void;
 }
 
 export const useCustomFormStore = create<CustomFormState>((set) => ({
   teamRequirements: {
-    teamSize: "",
+    memberSize: "",
     currentSolution: "",
     painPoints: [],
+    communityOnboarding: "",
   },
   features: {
     features: [],
@@ -78,4 +80,4 @@ export const useCustomFormStore = create<CustomFormState>((set) => ({
   setTimeLine: (data) => set({ timeLine: data }),
   setContact: (data) => set({ contact: data }),
   setSecurity: (data) => set({ security: data }),
-}))
+}));
