@@ -1,62 +1,88 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-import { useCustomFormStore } from "@/lib/custom-form-store"
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { useCustomFormStore } from "@/lib/custom-form-store";
 
 interface ContactInformationProps {
-  onNext: () => void
-  onPrevious: () => void
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
-export default function ContactInformation({ onNext, onPrevious }: ContactInformationProps) {
-  const { contact, setContact, teamRequirements, features, timeLine, security } = useCustomFormStore()
-  const [firstName, setFirstName] = useState(contact?.firstName || "")
-  const [lastName, setLastName] = useState(contact?.lastName || "")
-  const [email, setEmail] = useState(contact?.email || "")
-  const [phone, setPhone] = useState(contact?.phone || "")
-  const [jobTitle, setJobTitle] = useState(contact?.jobTitle || "")
-  const [contactMethod, setContactMethod] = useState(contact?.contactMethod || "email")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [apiError, setApiError] = useState<string | null>(null)
+export default function ContactInformation({
+  onNext,
+  onPrevious,
+}: ContactInformationProps) {
+  const {
+    contact,
+    setContact,
+    teamRequirements,
+    features,
+    timeLine,
+    security,
+  } = useCustomFormStore();
+  const [firstName, setFirstName] = useState(contact?.firstName || "");
+  const [lastName, setLastName] = useState(contact?.lastName || "");
+  const [email, setEmail] = useState(contact?.email || "");
+  const [phone, setPhone] = useState(contact?.phone || "");
+  const [jobTitle, setJobTitle] = useState(contact?.jobTitle || "");
+  const [contactMethod, setContactMethod] = useState(
+    contact?.contactMethod || "email"
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{
-    firstName?: string
-    lastName?: string
-    email?: string
-    jobTitle?: string
-  }>({})
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    jobTitle?: string;
+  }>({});
 
   const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setApiError(null)
+    e.preventDefault();
+    setApiError(null);
 
-    const newErrors: typeof errors = {}
-    if (!firstName) newErrors.firstName = "Please enter your first name"
-    if (!lastName) newErrors.lastName = "Please enter your last name"
-    if (!email) newErrors.email = "Please enter your email"
-    else if (!validateEmail(email)) newErrors.email = "Please enter a valid email"
-    if (!jobTitle) newErrors.jobTitle = "Please enter your job title"
+    const newErrors: typeof errors = {};
+    if (!firstName) newErrors.firstName = "Please enter your first name";
+    if (!lastName) newErrors.lastName = "Please enter your last name";
+    if (!email) newErrors.email = "Please enter your email";
+    else if (!validateEmail(email))
+      newErrors.email = "Please enter a valid email";
+    if (!jobTitle) newErrors.jobTitle = "Please enter your job title";
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
-    setIsSubmitting(true)
-    const contactData = { firstName, lastName, email, phone, jobTitle, contactMethod }
-    setContact(contactData)
+    setIsSubmitting(true);
+    const contactData = {
+      firstName,
+      lastName,
+      email,
+      phone,
+      jobTitle,
+      contactMethod,
+    };
+    setContact(contactData);
 
     try {
       const response = await fetch("/api/custom-request", {
@@ -71,30 +97,30 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
           contact: contactData,
           security,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         if (response.status === 429) {
-          setApiError("Too many requests. Please wait a moment and try again.")
+          setApiError("Too many requests. Please wait a moment and try again.");
         } else if (data.errors && Array.isArray(data.errors)) {
-          setApiError(data.errors.join(", "))
+          setApiError(data.errors.join(", "));
         } else {
-          setApiError(data.error || "Something went wrong. Please try again.")
+          setApiError(data.error || "Something went wrong. Please try again.");
         }
-        setIsSubmitting(false)
-        return
+        setIsSubmitting(false);
+        return;
       }
 
-      setIsSubmitting(false)
-      onNext()
+      setIsSubmitting(false);
+      onNext();
     } catch (error) {
-      console.error("Submission error:", error)
-      setApiError("Network error. Please check your connection and try again.")
-      setIsSubmitting(false)
+      console.error("Submission error:", error);
+      setApiError("Network error. Please check your connection and try again.");
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -122,15 +148,24 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
-              {errors.firstName && <p className="text-sm text-destructive">{errors.firstName}</p>}
+              {errors.firstName && (
+                <p className="text-sm text-destructive">{errors.firstName}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="lastName">
                 Last Name <span className="text-destructive">*</span>
               </Label>
-              <Input id="lastName" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-              {errors.lastName && <p className="text-sm text-destructive">{errors.lastName}</p>}
+              <Input
+                id="lastName"
+                placeholder="Doe"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+              {errors.lastName && (
+                <p className="text-sm text-destructive">{errors.lastName}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -144,7 +179,9 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -167,7 +204,9 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
               />
-              {errors.jobTitle && <p className="text-sm text-destructive">{errors.jobTitle}</p>}
+              {errors.jobTitle && (
+                <p className="text-sm text-destructive">{errors.jobTitle}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -180,6 +219,7 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
                   <SelectItem value="email">Email</SelectItem>
                   <SelectItem value="phone">Phone</SelectItem>
                   <SelectItem value="video">Video Call</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -196,5 +236,5 @@ export default function ContactInformation({ onNext, onPrevious }: ContactInform
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

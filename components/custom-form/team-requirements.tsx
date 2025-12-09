@@ -59,6 +59,14 @@ export default function TeamRequirements({ onNext }: TeamRequirementsProps) {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setPainPoints(painPointOptions.map((option) => option.value));
+    } else {
+      setPainPoints([]);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberSize) {
@@ -139,9 +147,26 @@ export default function TeamRequirements({ onNext }: TeamRequirementsProps) {
           </div>
 
           <div className="space-y-3">
-            <Label>
-              What are your main pain points? (Select all that apply)
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label>
+                What are your main pain points? (Select all that apply)
+              </Label>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="select-all"
+                  checked={painPoints.length === painPointOptions.length}
+                  onCheckedChange={(checked) =>
+                    handleSelectAll(checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="select-all"
+                  className="font-normal cursor-pointer text-sm"
+                >
+                  Select All
+                </Label>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {painPointOptions.map((option) => (
                 <div key={option.value} className="flex items-center space-x-2">
