@@ -1,5 +1,3 @@
-// Input validation and sanitization utilities
-
 export interface FormSubmissionData {
   teamRequirements: {
     memberSize: string;
