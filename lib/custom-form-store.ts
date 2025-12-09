@@ -4,7 +4,6 @@ interface TeamRequirements {
   memberSize: string;
   currentSolution: string;
   painPoints: string[];
-  communityOnboarding: string;
 }
 
 interface Features {
@@ -51,7 +50,6 @@ export const useCustomFormStore = create<CustomFormState>((set) => ({
     memberSize: "",
     currentSolution: "",
     painPoints: [],
-    communityOnboarding: "",
   },
   features: {
     features: [],

@@ -3,7 +3,6 @@ export interface FormSubmissionData {
     memberSize: string;
     currentSolution: string;
     painPoints: string[];
-    communityOnboarding: string;
   };
   features: {
     features: string[];
@@ -126,7 +125,6 @@ export function validateFormSubmission(data: unknown): {
       painPoints: Array.isArray(tr.painPoints)
         ? tr.painPoints.map((p) => sanitizeString(String(p))).slice(0, 20)
         : [],
-      communityOnboarding: sanitizeString(tr.communityOnboarding as string),
     },
     features: {
       features: Array.isArray(ft.features)

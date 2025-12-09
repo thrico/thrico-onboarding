@@ -144,15 +144,15 @@ const moduleCategories: ModuleCategory[] = [
     ],
   },
   {
-    category: "Charity",
+    category: "Charity (Future wave) *",
     modules: [{ id: "giving", label: "Giving", icon: Heart }],
   },
   {
-    category: "Collaboration",
+    category: "Collaboration (Future wave) *",
     modules: [{ id: "projects", label: "Projects", icon: FolderKanban }],
   },
   {
-    category: "Courses",
+    category: "Courses (Future wave) *",
     modules: [
       { id: "courses", label: "Courses", icon: GraduationCap },
       { id: "coaches", label: "Coaches", icon: School },

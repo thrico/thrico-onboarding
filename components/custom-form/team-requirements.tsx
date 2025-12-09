@@ -46,9 +46,6 @@ export default function TeamRequirements({ onNext }: TeamRequirementsProps) {
   const [painPoints, setPainPoints] = useState<string[]>(
     teamRequirements?.painPoints || []
   );
-  const [communityOnboarding, setCommunityOnboarding] = useState(
-    teamRequirements?.communityOnboarding || ""
-  );
   const [errors, setErrors] = useState<{ memberSize?: string }>({});
 
   const handlePainPointChange = (value: string, checked: boolean) => {
@@ -77,8 +74,8 @@ export default function TeamRequirements({ onNext }: TeamRequirementsProps) {
       memberSize,
       currentSolution,
       painPoints,
-      communityOnboarding,
     });
+
     onNext();
   };
 
@@ -121,29 +118,6 @@ export default function TeamRequirements({ onNext }: TeamRequirementsProps) {
               value={currentSolution}
               onChange={(e) => setCurrentSolution(e.target.value)}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="communityOnboarding">
-              Community Onboarding Setup
-            </Label>
-            <Select
-              value={communityOnboarding}
-              onValueChange={setCommunityOnboarding}
-            >
-              <SelectTrigger id="communityOnboarding">
-                <SelectValue placeholder="Select onboarding preference" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="self-service">
-                  Self-service onboarding
-                </SelectItem>
-                <SelectItem value="guided">Guided onboarding</SelectItem>
-                <SelectItem value="white-glove">White-glove setup</SelectItem>
-                <SelectItem value="custom">Custom onboarding plan</SelectItem>
-                <SelectItem value="none">No onboarding needed</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-3">
