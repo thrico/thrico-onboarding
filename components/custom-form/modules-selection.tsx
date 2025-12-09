@@ -170,6 +170,7 @@ export default function ModulesSelection({
   onPrevious,
 }: ModulesSelectionProps) {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleModuleToggle = (moduleId: string) => {
     setSelectedModules((prev) =>
@@ -199,69 +200,126 @@ export default function ModulesSelection({
     return category.modules.every((m) => selectedModules.includes(m.id));
   };
 
+  const filteredCategories = moduleCategories
+    .map((category) => ({
+      ...category,
+      modules: category.modules.filter((module) =>
+        module.label.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((category) => category.modules.length > 0);
+
+  const totalSelected = selectedModules.length;
+  const totalModules = moduleCategories.reduce(
+    (acc, cat) => acc + cat.modules.length,
+    0
+  );
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Select Modules</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Choose the modules you want to include in your plan
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Select Modules</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Choose the modules you want to include in your plan
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-medium">
+              {totalSelected} of {totalModules} selected
+            </p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {moduleCategories.map((category) => (
-          <div key={category.category} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">{category.category}</h3>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`select-all-${category.category}`}
-                  checked={isCategoryFullySelected(category)}
-                  onCheckedChange={(checked) =>
-                    handleCategorySelectAll(category, checked as boolean)
-                  }
-                />
-                <Label
-                  htmlFor={`select-all-${category.category}`}
-                  className="font-normal cursor-pointer text-sm"
-                >
-                  Select All
-                </Label>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search modules..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+          {filteredCategories.map((category) => (
+            <div key={category.category} className="space-y-3">
+              <div className="flex items-center justify-between sticky top-0 bg-background py-2 z-10">
+                <h3 className="text-base font-semibold text-primary">
+                  {category.category}
+                </h3>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`select-all-${category.category}`}
+                    checked={isCategoryFullySelected(category)}
+                    onCheckedChange={(checked) =>
+                      handleCategorySelectAll(category, checked as boolean)
+                    }
+                  />
+                  <Label
+                    htmlFor={`select-all-${category.category}`}
+                    className="font-normal cursor-pointer text-xs text-muted-foreground"
+                  >
+                    Select All
+                  </Label>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {category.modules.map((module) => {
+                  const Icon = module.icon;
+                  const isSelected = selectedModules.includes(module.id);
+                  return (
+                    <div
+                      key={module.id}
+                      className={`flex items-center space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-border hover:border-primary/50 hover:bg-accent/30"
+                      }`}
+                      onClick={() => handleModuleToggle(module.id)}
+                    >
+                      <Checkbox
+                        id={module.id}
+                        checked={isSelected}
+                        onCheckedChange={() => handleModuleToggle(module.id)}
+                        className="pointer-events-none"
+                      />
+                      <Icon
+                        className={`h-5 w-5 transition-colors ${
+                          isSelected ? "text-primary" : "text-muted-foreground"
+                        }`}
+                      />
+                      <Label
+                        htmlFor={module.id}
+                        className={`text-sm cursor-pointer flex-1 ${
+                          isSelected ? "font-medium" : "font-normal"
+                        }`}
+                      >
+                        {module.label}
+                      </Label>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {category.modules.map((module) => {
-                const Icon = module.icon;
-                return (
-                  <div
-                    key={module.id}
-                    className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors"
-                  >
-                    <Checkbox
-                      id={module.id}
-                      checked={selectedModules.includes(module.id)}
-                      onCheckedChange={() => handleModuleToggle(module.id)}
-                    />
-                    <Icon className="h-5 w-5 text-muted-foreground" />
-                    <Label
-                      htmlFor={module.id}
-                      className="text-sm font-normal cursor-pointer flex-1"
-                    >
-                      {module.label}
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
-        <div className="flex justify-between pt-4">
+        {filteredCategories.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No modules found matching "{searchQuery}"
+          </div>
+        )}
+
+        <div className="flex justify-between pt-4 border-t">
           <Button type="button" variant="outline" onClick={onPrevious}>
             <ChevronLeft className="mr-2 h-4 w-4" />
             Previous
           </Button>
           <Button type="button" onClick={onNext}>
-            Next
+            Next ({totalSelected} selected)
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
