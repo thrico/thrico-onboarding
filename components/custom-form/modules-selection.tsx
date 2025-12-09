@@ -55,6 +55,7 @@ interface Module {
 interface ModuleCategory {
   category: string;
   modules: Module[];
+  isFutureWave?: boolean;
 }
 
 const moduleCategories: ModuleCategory[] = [
@@ -144,15 +145,18 @@ const moduleCategories: ModuleCategory[] = [
     ],
   },
   {
-    category: "Charity (Future wave) *",
+    category: "Charity",
+    isFutureWave: true,
     modules: [{ id: "giving", label: "Giving", icon: Heart }],
   },
   {
-    category: "Collaboration (Future wave) *",
+    category: "Collaboration",
+    isFutureWave: true,
     modules: [{ id: "projects", label: "Projects", icon: FolderKanban }],
   },
   {
-    category: "Courses (Future wave) *",
+    category: "Courses",
+    isFutureWave: true,
     modules: [
       { id: "courses", label: "Courses", icon: GraduationCap },
       { id: "coaches", label: "Coaches", icon: School },
@@ -247,9 +251,16 @@ export default function ModulesSelection({
           {filteredCategories.map((category) => (
             <div key={category.category} className="space-y-3">
               <div className="flex items-center justify-between sticky top-0 bg-background py-2 z-10">
-                <h3 className="text-base font-semibold text-primary">
-                  {category.category}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-primary">
+                    {category.category}
+                  </h3>
+                  {category.isFutureWave && (
+                    <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full">
+                      Future Wave
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id={`select-all-${category.category}`}
@@ -274,7 +285,11 @@ export default function ModulesSelection({
                     <div
                       key={module.id}
                       className={`flex items-center space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                        isSelected
+                        category.isFutureWave
+                          ? isSelected
+                            ? "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 shadow-sm"
+                            : "border-border hover:border-purple-400 hover:bg-purple-50/30 dark:hover:bg-purple-950/30"
+                          : isSelected
                           ? "border-primary bg-primary/5 shadow-sm"
                           : "border-border hover:border-primary/50 hover:bg-accent/30"
                       }`}
@@ -288,7 +303,13 @@ export default function ModulesSelection({
                       />
                       <Icon
                         className={`h-5 w-5 transition-colors ${
-                          isSelected ? "text-primary" : "text-muted-foreground"
+                          category.isFutureWave
+                            ? isSelected
+                              ? "text-purple-600"
+                              : "text-muted-foreground"
+                            : isSelected
+                            ? "text-primary"
+                            : "text-muted-foreground"
                         }`}
                       />
                       <Label
