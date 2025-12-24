@@ -85,41 +85,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Process the submission
-    const submissionData = {
-      ...validation.sanitizedData,
-      metadata: {
-        submittedAt: new Date().toISOString(),
-        ipHash: Buffer.from(ip).toString("base64").slice(0, 16), // Store hashed IP for fraud detection
-        userAgent: request.headers.get("user-agent")?.slice(0, 200) || "",
-      },
-    };
-
-    // TODO: Save to database or send to external service
-    // For now, just log the submission
-    console.log(
-      "Custom request submission:",
-      JSON.stringify(submissionData, null, 2)
-    );
-
-    // Return success response with rate limit headers
-    return NextResponse.json(
-      {
-        success: true,
-        message:
-          "Your plan request has been submitted successfully. Our team will contact you within 24-48 hours.",
-      },
-      {
-        status: 200,
-        headers: {
-          "X-RateLimit-Limit": RATE_LIMIT_CONFIG.maxRequests.toString(),
-          "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-          "X-RateLimit-Reset": Math.ceil(
-            rateLimitResult.resetIn / 1000
-          ).toString(),
+    // Forward the validated data to the external API
+    try {
+      const externalRes = await fetch(
+        "https://nysr255hb3.execute-api.ap-south-1.amazonaws.com/prod/leads",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(validation.sanitizedData),
+        }
+      );
+      const externalData = await externalRes.json();
+      return NextResponse.json(
+        {
+          success: externalRes.ok,
+          external: externalData,
+          message: externalRes.ok
+            ? "Your plan request has been submitted successfully. Our team will contact you within 24-48 hours."
+            : "There was an error submitting your request to the external service.",
         },
-      }
-    );
+        {
+          status: externalRes.ok ? 200 : 502,
+          headers: {
+            "X-RateLimit-Limit": RATE_LIMIT_CONFIG.maxRequests.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": Math.ceil(
+              rateLimitResult.resetIn / 1000
+            ).toString(),
+          },
+        }
+      );
+    } catch (err) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to forward request to external API.",
+        },
+        { status: 502 }
+      );
+    }
   } catch (error) {
     console.error("Error processing custom request:", error);
     return NextResponse.json(
